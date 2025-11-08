@@ -8,13 +8,13 @@ from datetime import datetime
 from session_recorder import SessionRecorder
 from keyboard_listener import KeyboardListener
 
-class RecordingUI:
+class SessionRecorderUI:
     """Main UI for the Cuphead Session Recorder."""
     
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Cuphead Session Recorder (A2)")
-        self.root.geometry("400x350")
+        self.root.geometry("400x400")
         self.root.resizable(False, False)
         self.root.attributes('-topmost', True)
 
@@ -139,5 +139,5 @@ class RecordingUI:
         self.root.destroy()
 
 if __name__ == "__main__":
-    app = RecordingUI()
+    app = SessionRecorderUI()
     app.run()
