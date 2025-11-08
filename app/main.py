@@ -18,14 +18,12 @@ class SessionRecorderUI:
         self.root.resizable(False, False)
         self.root.attributes('-topmost', True)
 
-        # --- State Management ---
         self.is_recording = False
         self.session_recorder = None
         self.keyboard_listener = None
         self.update_thread_running = True
         
-        # This is your updated capture region
-        self.CAPTURE_REGION = {'top': 245, 'left': 6, 'width': 1123, 'height': 586}
+        self.CAPTURE_REGION = {'top': 225, 'left': 15, 'width': 956, 'height': 537}
 
         self._create_widgets()
         self._setup_keyboard_listener()
@@ -40,13 +38,10 @@ class SessionRecorderUI:
         style.configure('Green.TButton', background='#4CAF50', font=('Arial', 12, 'bold'))
         style.configure('Red.TButton', background='#f44336', font=('Arial', 12, 'bold'))
 
-        # Main control button
-        # MODIFIED: Changed button text from (F8) to (0)
-        self.start_stop_btn = ttk.Button(main_frame, text="Start Session (0)", 
+        self.start_stop_btn = ttk.Button(main_frame, text="Start Session (1)", 
                                          command=self.toggle_session, style='Green.TButton')
         self.start_stop_btn.pack(pady=10, ipady=10, fill=tk.X)
 
-        # Status and Telemetry
         status_frame = ttk.LabelFrame(main_frame, text="Live Status", padding="10")
         status_frame.pack(pady=10, expand=True, fill=tk.BOTH)
 
@@ -59,11 +54,9 @@ class SessionRecorderUI:
         self.last_action_var = tk.StringVar(value="Last Action: Idle")
         ttk.Label(status_frame, textvariable=self.last_action_var).pack(pady=5)
 
-        # Hotkey instructions
         hotkey_frame = ttk.LabelFrame(main_frame, text="Hotkeys", padding="10")
         hotkey_frame.pack(pady=10, fill=tk.X)
-        # MODIFIED: Changed all hotkey instruction labels
-        ttk.Label(hotkey_frame, text="0: Start/Stop Session").pack(anchor=tk.W)
+        ttk.Label(hotkey_frame, text="1: Start/Stop Session").pack(anchor=tk.W)
         ttk.Label(hotkey_frame, text="8: Mark Fight START").pack(anchor=tk.W)
         ttk.Label(hotkey_frame, text="9: Mark Fight END").pack(anchor=tk.W)
 
@@ -77,13 +70,12 @@ class SessionRecorderUI:
 
     def toggle_session(self):
         if self.is_recording:
-            # Stop the recording
+            # Stop the recording: this is now a non-blocking call
             self.session_recorder.stop_session()
             self.is_recording = False
-            # MODIFIED: Changed button text from (F8) to (0)
-            self.start_stop_btn.config(text="Start Session (0)", style='Green.TButton')
+            self.start_stop_btn.config(text="Start Session (1)", style='Green.TButton')
+            # The UI updates immediately, no freeze!
         else:
-            # Start a new recording
             session_name = simpledialog.askstring("Session Name", "Enter a name for this session:",
                                                   initialvalue=f"session_{datetime.now():%Y-%m-%d_%H-%M}")
             if not session_name:
@@ -93,26 +85,22 @@ class SessionRecorderUI:
             self.session_recorder = SessionRecorder(output_dir=output_path, region=self.CAPTURE_REGION)
             self.session_recorder.start_session(session_name)
             self.is_recording = True
-            # MODIFIED: Changed button text from (F8) to (0)
-            self.start_stop_btn.config(text="Stop Session (0)", style='Red.TButton')
+            self.start_stop_btn.config(text="Stop Session (1)", style='Red.TButton')
     
     def _on_key_event(self, event_type, key):
-        if self.is_recording:
+        if self.is_recording and self.session_recorder:
             self.session_recorder.log_key_event(event_type, key)
 
     def _on_marker_event(self, marker_type):
-        if self.is_recording:
+        if self.is_recording and self.session_recorder:
             self.session_recorder.log_marker_event(marker_type)
 
     def _update_telemetry(self):
-        """Periodically updates the UI labels with stats from the recorder."""
-        if self.is_recording and self.session_recorder:
+        if self.session_recorder:
             stats = self.session_recorder.get_session_stats()
-            
             elapsed_s = int(stats['elapsed_s'])
             minutes, seconds = divmod(elapsed_s, 60)
             self.session_time_var.set(f"Session Time: {minutes:02d}:{seconds:02d}")
-            
             self.fights_marked_var.set(f"Fights Marked: {stats['fights_marked']}")
             self.last_action_var.set(f"Last Action: {stats['last_action']}")
 
@@ -122,7 +110,7 @@ class SessionRecorderUI:
                 try:
                     self.root.after(0, self._update_telemetry)
                     time.sleep(0.5)
-                except (tk.TclError, RuntimeError): # Handle window being closed
+                except (tk.TclError, RuntimeError):
                     break
         threading.Thread(target=update_loop, daemon=True).start()
 
@@ -132,7 +120,7 @@ class SessionRecorderUI:
 
     def _on_closing(self):
         self.update_thread_running = False
-        if self.is_recording:
+        if self.is_recording and self.session_recorder:
             self.session_recorder.stop_session()
         if self.keyboard_listener:
             self.keyboard_listener.stop()

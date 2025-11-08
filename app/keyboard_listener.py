@@ -46,9 +46,9 @@ class KeyboardListener:
         key_char = getattr(key, 'char', None)
 
         # --- Handle Hotkeys ---
-        if key_char == '0':
+        if key_char == '1':
             self.session_toggle_callback()
-            return # IMPORTANT: Return to not log hotkeys as gameplay
+            return 
         if key_char == '8':
             self.marker_callback("fight_start")
             return

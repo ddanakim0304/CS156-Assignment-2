@@ -32,4 +32,4 @@ htmlcov/
 dist/
 build/
 *.egg-info/
-data/summaries/fight_summaries.csv
+data/sessions/*.mp4
