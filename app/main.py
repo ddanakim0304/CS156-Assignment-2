@@ -1,9 +1,11 @@
+# FILE: app/main.py (CORRECTED to pause the listener)
 import tkinter as tk
 from tkinter import ttk, simpledialog
 import threading
 import time
 from pathlib import Path
 from datetime import datetime
+import queue
 
 from session_recorder import SessionRecorder
 from keyboard_listener import KeyboardListener
@@ -23,11 +25,14 @@ class SessionRecorderUI:
         self.keyboard_listener = None
         self.update_thread_running = True
         
+        self.ui_action_queue = queue.Queue()
+        
         self.CAPTURE_REGION = {'top': 225, 'left': 15, 'width': 956, 'height': 537}
 
         self._create_widgets()
         self._setup_keyboard_listener()
         self._start_ui_updates()
+        self._process_ui_queue()
 
     def _create_widgets(self):
         main_frame = ttk.Frame(self.root, padding="15")
@@ -63,21 +68,37 @@ class SessionRecorderUI:
     def _setup_keyboard_listener(self):
         self.keyboard_listener = KeyboardListener(
             key_callback=self._on_key_event,
-            marker_callback=self._on_marker_event,
-            session_toggle_callback=self.toggle_session
+            marker_callback=lambda marker: self.ui_action_queue.put(('marker', marker)),
+            session_toggle_callback=lambda: self.ui_action_queue.put(('toggle_session', None))
         )
         self.keyboard_listener.start()
+        
+    def _process_ui_queue(self):
+        try:
+            message_type, data = self.ui_action_queue.get_nowait()
+            if message_type == 'toggle_session':
+                self.toggle_session()
+            elif message_type == 'marker':
+                self._on_marker_event(data)
+        except queue.Empty:
+            pass
+        finally:
+            self.root.after(100, self._process_ui_queue)
 
     def toggle_session(self):
         if self.is_recording:
-            # Stop the recording: this is now a non-blocking call
-            self.session_recorder.stop_session()
+            if self.session_recorder:
+                self.session_recorder.stop_session()
             self.is_recording = False
             self.start_stop_btn.config(text="Start Session (1)", style='Green.TButton')
-            # The UI updates immediately, no freeze!
         else:
+            # MODIFIED: Pause listener before showing dialog
+            self.keyboard_listener.pause()
             session_name = simpledialog.askstring("Session Name", "Enter a name for this session:",
                                                   initialvalue=f"session_{datetime.now():%Y-%m-%d_%H-%M}")
+            # MODIFIED: Resume listener after dialog is closed
+            self.keyboard_listener.resume()
+
             if not session_name:
                 return
 

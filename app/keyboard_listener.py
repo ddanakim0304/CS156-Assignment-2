@@ -1,10 +1,10 @@
+# FILE: app/keyboard_listener.py (CORRECTED with pause/resume)
 from pynput import keyboard
 from pynput.keyboard import Key
 
 class KeyboardListener:
     """Handles global keyboard event listening for gameplay and session markers."""
     
-    # Define keys to track for gameplay
     GAMEPLAY_KEYS = {
         'a', 'd', 'f', 'x', Key.space, 
         Key.up, Key.down, Key.left, Key.right
@@ -17,6 +17,15 @@ class KeyboardListener:
         
         self.listener = None
         self._pressed_keys = set()
+        self.is_paused = False # NEW: Add a pause flag
+
+    # NEW: Method to pause the listener
+    def pause(self):
+        self.is_paused = True
+
+    # NEW: Method to resume the listener
+    def resume(self):
+        self.is_paused = False
 
     def start(self):
         if not self.listener:
@@ -30,22 +39,21 @@ class KeyboardListener:
 
     @staticmethod
     def _normalize_key(key):
-        """Convert pynput key object to a simple, consistent string."""
         if hasattr(key, 'char') and key.char:
             return key.char.lower()
         return str(key)
 
     def _on_press(self, key):
-        # Prevent key-repeat events from being logged
+        # MODIFIED: Check if paused at the very beginning
+        if self.is_paused:
+            return
+
         if key in self._pressed_keys:
             return
         self._pressed_keys.add(key)
         
-        # MODIFIED: The entire hotkey logic is changed to use number keys
-        # This is a safe way to get the character of a key, if it exists
         key_char = getattr(key, 'char', None)
 
-        # --- Handle Hotkeys ---
         if key_char == '1':
             self.session_toggle_callback()
             return 
@@ -56,15 +64,15 @@ class KeyboardListener:
             self.marker_callback("fight_end")
             return
 
-        # --- Handle Gameplay Keys ---
-        # Check against both character keys and special Key objects
         if key in self.GAMEPLAY_KEYS or (key_char and key_char in self.GAMEPLAY_KEYS):
             self.key_callback('keydown', self._normalize_key(key))
 
     def _on_release(self, key):
-        self._pressed_keys.discard(key)
+        # MODIFIED: Also check if paused on release
+        if self.is_paused:
+            return
 
-        # --- Handle Gameplay Keys ---
+        self._pressed_keys.discard(key)
         key_char = getattr(key, 'char', None)
         if key in self.GAMEPLAY_KEYS or (key_char and key_char in self.GAMEPLAY_KEYS):
             self.key_callback('keyup', self._normalize_key(key))
