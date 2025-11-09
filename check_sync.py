@@ -73,7 +73,7 @@ def draw_key_state_on_frame(frame, keys_down: set):
         if key == 'x': display_key = "LOCK"
         if key == 'a': display_key = "SPECIAL"
         
-        cv2.putText(frame, display_key, pos, cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
+        cv2.putText(frame, display_key, pos, cv2.FONT_HERSHEY_SIMPLEX, 0.4, color, 2)
     return frame
 
 def main():
@@ -124,7 +124,7 @@ def main():
             
             # Draw current timestamp
             time_text = f"Time: {current_time_sec:.2f}s"
-            cv2.putText(frame_with_overlay, time_text, (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+            cv2.putText(frame_with_overlay, time_text, (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 2)
             
             cv2.imshow('Sync Check - Press "q" to quit', frame_with_overlay)
 

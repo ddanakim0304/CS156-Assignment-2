@@ -8,7 +8,7 @@ env/
 venv/
 ENV/
 .venv_recording/
-.venv_training/
+.venv/
 
 # Data files (actual logging output)
 data/summaries/

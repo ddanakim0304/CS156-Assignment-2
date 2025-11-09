@@ -1,0 +1,21 @@
+# FILE: environment.yml
+name: venv_training
+channels:
+  - apple
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+    - tensorflow-macos==2.15.*
+    - tensorflow-metal==1.1.*
+    - opencv-python
+    - numpy
+    - pandas
+    - pynput
+    - mss
+    - scikit-learn
+    - matplotlib
+    - jupyter
+    - tqdm
+    - ipykernel

@@ -53,8 +53,7 @@ class SessionRecorder:
             
         print("Signaling recording thread to stop...")
         self.is_recording = False
-        self._shutdown_event.set() # Signal the worker to exit its loop
-        # We DO NOT call .join() here. The UI thread is free to continue.
+        self._shutdown_event.set()
 
     def log_key_event(self, event_type: str, key: str):
         if not self.is_recording: return
