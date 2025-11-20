@@ -27,7 +27,7 @@ class SessionRecorderUI:
         
         self.ui_action_queue = queue.Queue()
         
-        self.CAPTURE_REGION = {'top': 260, 'left': 1, 'width': 957, 'height': 536}
+        self.CAPTURE_REGION = {'top': 289, 'left': 3, 'width': 716, 'height': 401}
 
         self._create_widgets()
         self._setup_keyboard_listener()

@@ -12,9 +12,9 @@ IMG_WIDTH = 128
 SEQUENCE_LENGTH = 10 # This was STACK_SIZE before, now it's for the RNN
 
 # This MUST match the region you used for your recording sessions
-CAPTURE_REGION = {'top': 260, 'left': 1, 'width': 957, 'height': 536}
+CAPTURE_REGION = {'top': 289, 'left': 3, 'width': 716, 'height': 401}
 
-ACTIONS = ['UP', 'DOWN', 'LEFT', 'RIGHT', 'JUMP', 'SHOOT', 'DASH', 'LOCK', 'SPECIAL']
+ACTIONS = ['UP', 'DOWN', 'LEFT', 'RIGHT', 'JUMP', 'SHOOT', 'DASH']
 
 # --- Load the Trained Models ---
 print("Loading trained models...")

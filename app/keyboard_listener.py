@@ -5,10 +5,7 @@ from pynput.keyboard import Key
 class KeyboardListener:
     """Handles global keyboard event listening for gameplay and session markers."""
     
-    GAMEPLAY_KEYS = {
-        'a', 'd', 'f', 'x', Key.space, 
-        Key.up, Key.down, Key.left, Key.right
-    }
+    GAMEPLAY_KEYS = {'d', 'f', Key.space, Key.up, Key.down, Key.left, Key.right}
 
     def __init__(self, key_callback, marker_callback, session_toggle_callback):
         self.key_callback = key_callback

@@ -19,15 +19,13 @@ KEY_MAP = {
     'JUMP': Key.space,
     'SHOOT': 'f',
     'DASH': 'd',
-    'LOCK': 'x',
-    'SPECIAL': 'a'
 }
 ACTIONS = list(KEY_MAP.keys())
 
 # --- Configuration (same as before) ---
 IMG_HEIGHT, IMG_WIDTH = 72, 128
 SEQUENCE_LENGTH = 10
-CAPTURE_REGION = {'top': 260, 'left': 1, 'width': 957, 'height': 536}
+CAPTURE_REGION = {'top': 289, 'left': 3, 'width': 716, 'height': 401}
 
 # --- Load Models (same as before) ---
 print("Loading trained models...")

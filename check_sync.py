@@ -52,8 +52,6 @@ def draw_key_state_on_frame(frame, keys_down: set):
         'Key.space': (30, 150),
         'f': (150, 150),
         'd': (200, 150),
-        'x': (250, 150),
-        'a': (300, 150),
     }
     
     y_offset = 30 # Position the whole block from the top
@@ -70,8 +68,6 @@ def draw_key_state_on_frame(frame, keys_down: set):
         display_key = key.replace("Key.", "").upper()
         if key == 'f': display_key = "SHOOT"
         if key == 'd': display_key = "DASH"
-        if key == 'x': display_key = "LOCK"
-        if key == 'a': display_key = "SPECIAL"
         
         cv2.putText(frame, display_key, pos, cv2.FONT_HERSHEY_SIMPLEX, 0.4, color, 2)
     return frame
