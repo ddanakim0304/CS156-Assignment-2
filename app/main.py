@@ -24,11 +24,9 @@ class SessionRecorderUI:
         self.session_recorder = None
         self.keyboard_listener = None
         self.update_thread_running = True
-        
+    
         self.ui_action_queue = queue.Queue()
-        
-        self.CAPTURE_REGION = {'top': 289, 'left': 3, 'width': 716, 'height': 401}
-
+        self.CAPTURE_REGION = {'top': 264, 'left': 0, 'width': 720, 'height': 403}
         self._create_widgets()
         self._setup_keyboard_listener()
         self._start_ui_updates()
@@ -148,5 +146,27 @@ class SessionRecorderUI:
         self.root.destroy()
 
 if __name__ == "__main__":
-    app = SessionRecorderUI()
-    app.run()
+    import sys
+    import platform
+    
+    # Check for macOS and warn about accessibility permissions
+    if platform.system() == "Darwin":
+        print("=" * 60)
+        print("macOS Accessibilx ity Permissions Required")
+        print("=" * 60)
+        print("If the app crashes with 'trace trap', you need to:")
+        print("1. Open System Settings → Privacy & Security → Accessibility")
+        print("2. Add your Terminal app and grant permission")
+        print("3. Restart this application")
+        print("=" * 60)
+        print()
+    
+    try:
+        app = SessionRecorderUI()
+        app.run()
+    except Exception as e:
+        print(f"\nError starting application: {e}")
+        if platform.system() == "Darwin":
+            print("\nThis might be an accessibility permissions issue.")
+            print("Please check System Settings → Privacy & Security → Accessibility")
+        sys.exit(1)
