@@ -11,7 +11,7 @@ from session_recorder import SessionRecorder
 from keyboard_listener import KeyboardListener
 
 class SessionRecorderUI:
-    """Main UI for the Cuphead Session Recorder."""
+    """Main UㄱI for the Cuphead Session Recorder."""
     
     def __init__(self):
         self.root = tk.Tk()

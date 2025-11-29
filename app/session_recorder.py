@@ -30,6 +30,11 @@ class SessionRecorder:
         # UI Stats
         self.fights_marked = 0
         self.last_action = ""
+        
+        # Fight Timer Logic (For UI Display Only)
+        self.in_fight = False
+        self.total_fight_time = 0.0  # Accumulated time of completed fights
+        self.current_fight_start_time = 0.0 # Start time of current active fight
 
     def start_session(self, session_name: str):
         if self.is_recording:
@@ -38,8 +43,13 @@ class SessionRecorder:
         print(f"Starting session: {session_name}")
         self.is_recording = True
         self._shutdown_event.clear()
+        
+        # Reset Stats
         self.fights_marked = 0
         self.last_action = "Ready"
+        self.in_fight = False
+        self.total_fight_time = 0.0
+        self.current_fight_start_time = 0.0
         
         # --- Define Paths ---
         video_path = self.output_dir / f"{session_name}.mp4"
@@ -66,6 +76,12 @@ class SessionRecorder:
     def stop_session(self):
         if not self.is_recording:
             return
+        
+        # If we stop session while in a fight, add the partial time
+        if self.in_fight:
+            self.total_fight_time += (time.time() - self.current_fight_start_time)
+            self.in_fight = False
+            
         print("Stopping session...")
         self.is_recording = False
         self._shutdown_event.set()
@@ -84,7 +100,7 @@ class SessionRecorder:
         self.last_action = f"{key} ({event_type})"
 
     def log_marker_event(self, marker_type: str):
-        """Logs a fight marker with exact UTC time."""
+        """Logs a fight marker with exact UTC time and updates Fight Timer."""
         if not self.is_recording: return
         
         # UTC TIMESTAMP
@@ -97,14 +113,32 @@ class SessionRecorder:
         print(f"📍 MARKER: {marker_type}")
         self.last_action = f"MARKER: {marker_type}"
         
+        # --- Timer Logic for UI ---
         if marker_type == 'fight_start':
             self.fights_marked += 1
+            if not self.in_fight:
+                self.in_fight = True
+                self.current_fight_start_time = t
+                
+        elif marker_type == 'fight_end':
+            if self.in_fight:
+                # Add the duration of this specific fight to the total
+                duration = t - self.current_fight_start_time
+                self.total_fight_time += duration
+                self.in_fight = False
 
     def get_session_stats(self) -> dict:
+        """Returns stats for the UI. elapsed_s now returns Total Fight Time."""
         if not self.is_recording:
             return {'elapsed_s': 0, 'fights_marked': 0, 'last_action': 'Stopped'}
+        
+        # Calculate time to display
+        current_display_time = self.total_fight_time
+        if self.in_fight:
+            current_display_time += (time.time() - self.current_fight_start_time)
+            
         return {
-            'elapsed_s': 0, # Not tracking elapsed time relative to start anymore
+            'elapsed_s': current_display_time, 
             'fights_marked': self.fights_marked, 
             'last_action': self.last_action
         }
