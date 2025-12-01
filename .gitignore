@@ -35,4 +35,6 @@ build/
 *.egg-info/
 data/sessions/*.mp4
 photos/Final_Comparison.mp4
-Assignment2_split/
+
+combine_notebook.py
+split_notebook.py
