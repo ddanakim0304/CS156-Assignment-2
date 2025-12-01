@@ -145,7 +145,6 @@ class SessionRecorder:
 
     def _worker(self):
         """
-        The 'Gold Standard' Worker.
         Uses UTC scheduling to ensure frames line up with wall-clock time.
         """
         try:
@@ -167,8 +166,6 @@ class SessionRecorder:
                         continue
 
                     # 2. Sync Logic
-                    # If the computer lagged (e.g. loading screen), 'now' will be much larger than 'next_frame_time'.
-                    # We loop to fill that gap with duplicate frames.
                     now = time.time()
                     
                     while next_frame_time < now:
